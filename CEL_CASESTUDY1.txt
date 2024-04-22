@@ -1,0 +1,40 @@
+% Parameters
+L = 50; % Length of the plate (in meters)
+N = 500; % Number of grid points in each dimension
+dx = L / (N - 1); % Grid spacing
+dt = 0.01; % Time step (small enough for stability)
+
+% Initial conditions
+T = zeros(N, N); % Initial temperature distribution
+T(:) = 0; % Initial temperature is 0 everywhere
+T(:, 1) = 100; % Left boundary at 100°C
+T(:, end) = 90; % Right boundary at 100°C
+T(1, :) = 110; % Top boundary at 100°C
+T(end, :) = 150; % Bottom boundary at 100°C
+T(N/2, N/2) = -100; % Center cooled at -100°C
+
+% Thermal conductivity
+k = 15;
+
+% Simulation
+total_time = 500; % Total simulation time (seconds)
+num_steps = total_time / dt; % Number of time steps
+for t = 1:num_steps
+    % Compute temperature distribution using finite difference method
+    T_new = T;
+    for i = 2:N-1
+        for j = 2:N-1
+            T_new(i, j) = T(i, j) + (k*dt/(dx^2)) * (T(i+1, j) + T(i-1, j) + T(i, j+1) + T(i, j-1) - 4*T(i, j));
+        end
+    end
+    T = T_new;
+end
+
+% Plotting
+[X, Y] = meshgrid(linspace(0, L, N), linspace(0, L, N));
+surf(X, Y, T);
+title('Temperature Distribution on Plate After 100 Seconds');
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Temperature (°C)');
+colorbar;
